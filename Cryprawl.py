@@ -13,7 +13,7 @@ from Batmage import Batmage
 from bat import Bat
 from pygame.math import Vector2
 
-class SkyForce:
+class Cryprawl:
     STATE_GAMERUNNING = 'gamerunning'
     STATE_MAINMENU = 'mainmenu'
     STATE_SETTING = 'setting'
@@ -24,15 +24,39 @@ class SkyForce:
         self.screen_rect = self.screen.get_rect()
         pygame.event.pump()
         pygame.display.set_allow_screensaver(False)
-        pygame.display.set_caption("SkyForce")
-        pygame.display.set_icon(pygame.image.load(rpath.rpath("assets/images/icon/SF.ico")).convert_alpha())
+        pygame.display.set_caption("Cryprawl")
+        pygame.display.set_icon(pygame.image.load(rpath.rpath("assets/images/icon/CR.ico")).convert_alpha())
+        #主标题
+        self.main_title_img = pygame.image.load(rpath.rpath("assets/images/background/MainTitle.png")).convert_alpha()
+        self.main_title_img_rect = self.main_title_img.get_rect()
+        self.main_title_img_rect.centerx = self.screen_rect.centerx
+        self.main_title_img_rect.centery = self.screen_rect.centery - 300
+        #背景贴图
         self.bg_img = pygame.image.load(rpath.rpath("assets/images/background/background.png")).convert_alpha()
+        self.bg_img_rect = self.bg_img.get_rect()
+        self.bg_img_rect.centerx = self.screen_rect.centerx
+        self.bg_img_rect.centery = self.screen_rect.centery + 40
+        #血量贴图
         self.hp_img = pygame.image.load(rpath.rpath("assets/images/ship/hp.png")).convert_alpha()
+        self.hp_img_rect = self.hp_img.get_rect()
+        #血槽贴图
         self.hpBar_img = pygame.image.load(rpath.rpath("assets/images/ship/hp_bar.png")).convert_alpha()
+        self.hpBar_img_rect = self.hpBar_img.get_rect()
+        #设置UI贴图
         self.setting_ui_img = pygame.image.load(rpath.rpath("assets/images/button/settingUI.png")).convert_alpha()
+        self.setting_ui_img_rect = self.setting_ui_img.get_rect()
+        self.setting_ui_img_rect.centerx = self.screen_rect.centerx
+        self.setting_ui_img_rect.centery = self.screen_rect.centery
+        #设置fullscreen贴图
+        self.fullscreen_img = pygame.image.load(rpath.rpath("assets/images/button/fullscreen.png"))
+        self.fullscreen_img_rect = self.fullscreen_img.get_rect()
+        self.fullscreen_img_rect.centerx = self.setting_ui_img_rect.centerx - 70
+        self.fullscreen_img_rect.centery = self.setting_ui_img_rect.centery - 190
+        
         
         #游戏状态
         self.game_state = self.STATE_MAINMENU
+        self.is_fullscreen = False
         # 游戏对象
         self.enemies = []
         self.dead_enemies = []
@@ -52,14 +76,28 @@ class SkyForce:
         self.bullets = pygame.sprite.Group()
         
         # Button相关
+        # play_button
         self.play_button = Button(self)
+        # setting_button
         self.setting_button = Button(self)
-        self.setting_button.rect.y = self.screen_rect.centery + 40
+        self.setting_button.rect.centery = self.screen_rect.centery + 80
         self.setting_button.image = pygame.image.load(rpath.rpath("assets/images/button/setting.png")).convert_alpha()
+        # exit_button
         self.exit_button = Button(self)
-        self.exit_button.rect.y = self.screen_rect.centery + 120
+        self.exit_button.rect.centery = self.screen_rect.centery + 160
         self.exit_button.image = pygame.image.load(rpath.rpath("assets/images/button/exit.png")).convert_alpha()
-
+        # back_button
+        self.back_button = Button(self)
+        self.back_button.rect.centerx = self.setting_ui_img_rect.centerx - 100
+        self.back_button.rect.centery = self.setting_ui_img_rect.centery + 210
+        self.back_button.image = pygame.image.load(rpath.rpath("assets/images/button/back.png")).convert_alpha()
+        # fullscreen_button
+        self.fullscreen_button = Button(self)
+        self.fullscreen_button.rect.centerx = self.fullscreen_img_rect.centerx + 230
+        self.fullscreen_button.rect.centery = self.fullscreen_img_rect.centery + 20
+        self.fullscreen_button.width = 48
+        self.fullscreen_button.height = 48
+        self.fullscreen_button.image = pygame.image.load(rpath.rpath("assets/images/button/checkbox.png")).convert_alpha()
         # 游戏数据
         self.game_run_times = 0
         self.score = 0
@@ -128,6 +166,9 @@ class SkyForce:
                     self._check_setting_button(mouse_pos)
                 elif self.game_state == self.STATE_GAMERUNNING:
                     self._fire_bullet()
+                elif self.game_state == self.STATE_SETTING:
+                    self._check_back_button(mouse_pos)
+                    self._check_fullscreen_button(mouse_pos)
     #Button相关
     def _check_play_button(self, mouse_pos):
         mouse_x, mouse_y = mouse_pos
@@ -158,6 +199,28 @@ class SkyForce:
             print(f"历史最高最大分数为: {self.all_max_score}")
             print(f"游戏局数为: {self.game_run_times}")
             sys.exit()
+    def _check_back_button(self, mouse_pos):
+        mouse_x, mouse_y = mouse_pos
+        button_rect = self.back_button.rect
+        if (button_rect.x <= mouse_x <= button_rect.x + button_rect.width and
+            button_rect.y <= mouse_y <= button_rect.y + button_rect.height and
+            self.game_state == self.STATE_SETTING and not self.dying):
+            self.snd_click.play()
+            self.game_state = self.STATE_MAINMENU
+    def _check_fullscreen_button(self, mouse_pos):
+        mouse_x, mouse_y = mouse_pos
+        button_rect = self.fullscreen_button.rect
+        if (button_rect.x <= mouse_x <= button_rect.x + button_rect.width and
+            button_rect.y <= mouse_y <= button_rect.y + button_rect.height and
+            self.game_state == self.STATE_SETTING and not self.dying):
+            self.snd_click.play()
+            if self.is_fullscreen:
+                screen = pygame.display.set_mode((self.settings.screen_width, self.settings.screen_height))
+                self.is_fullscreen = False
+            else:
+                screen = pygame.display.set_mode((pygame.display.Info().current_w, pygame.display.Info().current_h),pygame.FULLSCREEN)
+                self.is_fullscreen = True
+                
 
     # 子弹相关
     def _fire_bullet(self):
@@ -358,9 +421,16 @@ class SkyForce:
 
     #主屏幕绘制
     def _update_screen(self):
-        self.screen.blit(self.bg_img, (0, -260))        
+        #绘制背景
+        self.screen.blit(self.bg_img, self.bg_img_rect)
+        #绘制设置界面
         if self.game_state == self.STATE_SETTING:
-            self.screen.blit(self.setting_ui_img,(self.screen_rect.centerx - 250,self.screen_rect.centery - 250))
+            self.screen.blit(self.setting_ui_img,self.setting_ui_img_rect)
+            self.screen.blit(self.fullscreen_img,self.fullscreen_img_rect)
+            self.screen.blit(self.back_button.image,self.back_button.rect)
+            self.screen.blit(self.fullscreen_button.image,self.fullscreen_button.rect)
+
+        #绘制玩家
         if not self.ship.state == self.ship.STATE_DYING and self.game_state == self.STATE_GAMERUNNING:
             self.ship.blitme()
 
@@ -437,6 +507,7 @@ class SkyForce:
                 self.screen.blit(img, (x_score, 10))
 
         if self.game_state == self.STATE_MAINMENU and not self.dying:
+            self.screen.blit(self.main_title_img,self.main_title_img_rect)
             self.play_button.draw_button()
             self.setting_button.draw_button()
             self.exit_button.draw_button()
@@ -507,5 +578,5 @@ class SkyForce:
 
 # 入口
 if __name__ == '__main__':
-    sf = SkyForce()
-    sf.run_game()
+    cr = Cryprawl()
+    cr.run_game()
