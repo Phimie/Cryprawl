@@ -52,6 +52,7 @@ class Cryprawl:
         self.fullscreen_img_rect = self.fullscreen_img.get_rect()
         self.fullscreen_img_rect.centerx = self.setting_ui_img_rect.centerx - 70
         self.fullscreen_img_rect.centery = self.setting_ui_img_rect.centery - 190
+
         
         
         #游戏状态
@@ -98,6 +99,11 @@ class Cryprawl:
         self.fullscreen_button.width = 48
         self.fullscreen_button.height = 48
         self.fullscreen_button.image = pygame.image.load(rpath.rpath("assets/images/button/checkbox.png")).convert_alpha()
+        #tick贴图
+        self.tick_img = pygame.image.load(rpath.rpath("assets/images/button/tick.png"))
+        self.tick_img_rect = self.tick_img.get_rect()
+        self.tick_img_rect.centerx = self.fullscreen_button.rect.centerx - 66
+        self.tick_img_rect.centery = self.fullscreen_button.rect.centery - 10
         # 游戏数据
         self.game_run_times = 0
         self.score = 0
@@ -429,6 +435,8 @@ class Cryprawl:
             self.screen.blit(self.fullscreen_img,self.fullscreen_img_rect)
             self.screen.blit(self.back_button.image,self.back_button.rect)
             self.screen.blit(self.fullscreen_button.image,self.fullscreen_button.rect)
+            if self.is_fullscreen:
+                self.screen.blit(self.tick_img,self.tick_img_rect)
 
         #绘制玩家
         if not self.ship.state == self.ship.STATE_DYING and self.game_state == self.STATE_GAMERUNNING:
