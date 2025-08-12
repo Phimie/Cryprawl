@@ -1,99 +1,106 @@
-# Changelog
+[English](CHANGELOG-en.md) | 中文
+
+# 更新日志
+
+
 
 ## [Unreleased]
-
 - 
+
+
+
+
 
 ## [0.0.4-alpha.1] - 2025-08-11
 
-**This is an Alpha test build!**
+注意这是Alpha 测试版本!
 
-### Changed
+### 改动
 
-- Renamed the game to Cryprawl  
-- Replaced the game icon  
+- 游戏更名为 Cryprawl
+- 替换游戏图标
 
-### Added
+### 新增
 
-- Set key binding  
-- Exit key binding  
-- Settings screen  
-- Main title screen  
-- Full-screen toggle (windowed / full-screen)
+- 添加 Set 按键
+- 添加 Exit 按键
+- 添加设置界面
+- 添加 MainTitle
+- 添加全屏功能(窗口/全屏切换)
 
-### Improved
+### 优化
 
-- Introduced state constants and refactored all sprites and the main process state machine  
-- Enhanced code structure and readability  
+- 引入状态常量，统一重写所有精灵及主进程状态机实现
+- 优化代码结构与可读性
+
+
 
 ## [0.0.3] - 2025-08-10
 
-### Changed
+### 改动
 
-- Repositioned bullet counter display  
-- Increased starting health  
-- Increased starting bullet count  
-- Replaced enemy hit sprite  
+- 修改子弹数字显示位置
+- 初始血量增加
+- 初始子弹增加
+- 替换enemy受击贴图
 
-### Added
+### 新增
 
-- New enemy Batmage: spawns outside boundaries and periodically summons Bats  
-- New enemy Bat: tracks the player  
-- 1-second invulnerability after taking damage  
-- Scoring and extra-bullet logic for defeating Batmage and Bat  
-- Full sprite animation sets for Batmage and Bat  
-- Behavior logic for Batmage and Bat  
+- 新增敌人batmage:在边界外活动,时不时召唤bat
+- 新增敌人bat:追踪玩家
+- 撞击后无敌状态1s
+- 击败batmage和bat的得分逻辑和增加子弹数量逻辑
+- batmage和bat的所有行为贴图动画
+- batmage的行为逻辑和bat的行为逻辑
 
-### Improved
+### 优化
 
-- Added acceleration system; knock-back effects fully optimized  
+- 引入加速度:击退效果全面优化
+
+
 
 ## [0.0.2] - 2025-08-09
 
-### Fixed
+### 修复
 
-- Bullets no longer remain after game over  
+- 修复了游戏结束时子弹仍然存在的bug
 
-### Changed
+### 改动
 
-- Replaced score textures  
-- Replaced enemy hit and death animations  
-- Replaced background textures  
-- Replaced bullet textures  
-- Adjusted window size  
-- Adjusted playable area  
-- Enemies leaving the bottom edge no longer deduct points  
-- Updated enemy movement boundaries  
-- UI is now hidden on game over  
+- 替换分数贴图
+- 替换敌人受击贴图和死亡动画
+- 替换背景贴图
+- 替换bullet贴图
+- 修改窗口尺寸
+- 修改可活动范围
+- 敌人进入底下不再扣分
+- 更改敌人活动范围
+- 游戏结束时,UI不再显示
 
-### Added
+### 新增
 
-- Audio: BGM, game-over, hit, shoot…  
-- Mouse-controlled bullet direction  
-- Player health and health UI  
-- Player collision deals 100 damage to enemies and reduces player health  
-- Player death animation  
-- Score penalty on taking damage  
+- 音频:bgm,game_over,hit,shoot...
+- 鼠标控制子弹方向
+- 主体血量和血量UI
+- 主体撞击扣血并对敌人造成100点伤害
+- 主体死亡动画
+- 受伤扣分
 
 ## [0.0.1] - 2025-08-08
 
-### Changed
+### 改动
 
-- Replaced enemy sprite  
+- 替换敌人贴图
 
-### Added
+### 新增
+- 新增子弹数字 UI 和子弹伤害
+- 新增敌人死亡动画 和 敌人血量
+- 新增背景
 
-- Bullet counter UI and bullet damage  
-- Enemy death animation and enemy health  
-- Background  
-
-### Improved
-
-- Reduced memory usage when loading background images  
-- Switched keyboard handling to `pygame.key.get_pressed()` for faster response  
+### 优化
+- 减少背景图加载时的内存占用
+- 将键盘事件改为 `pygame.key.get_pressed()`，提升响应速度
 
 ## [0.0.0] - 2025-08-07
-
-### Added
-
-- Initial release: controllable character, basic shooting, enemy spawning, scoring system
+### 新增
+- 首版发布：可控制对象,基础射击,敌机生成,计分系统
