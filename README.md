@@ -1,2 +1,0 @@
-# Cryprawl
-Pygame-based
