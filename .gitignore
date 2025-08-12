@@ -1,15 +1,46 @@
+venv/
+env/
+
+
 dist/
 build/
 *.exe
 *.zip
+*.egg-info/
 
 __pycache__/
 *.pyc
 *.pyo
+*.pyd
+*.so
+*.dll
 
 .vscode/
 .idea/
+.vs/
+*.sln
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
 *.log
+logs/
+
+
+config.local.json
+*.local
+*.env
+
+
+*.tmp
+*.swp
+*.bak
+
 
 assets/
-config.local.json
+data/
+
+
+.DS_Store
+Thumbs.db
