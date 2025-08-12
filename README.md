@@ -1,4 +1,7 @@
+[English](CREDITS-en.md) | 中文
+
 # Cryprawl  
+
 **v0.0.4-alpha.1** | python 3.9+
 
 ---
