@@ -1,0 +1,19 @@
+# 编译产物
+dist/
+build/
+*.exe
+*.zip
+
+# Python 缓存
+__pycache__/
+*.pyc
+*.pyo
+
+# IDE / 编辑器
+.vscode/
+.idea/
+*.log
+
+# 大素材/本地配置
+assets/
+config.local.json
