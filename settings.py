@@ -6,7 +6,8 @@ class Settings:
         self.screen_height =1000
         #音量
         self.game_volume = 0.2
-        self.click_volume = 0.6
+        self.click_volume = 1.5
+        self.game_over_volume = 1.5
         #主体
         self.ship_speed = 320
         self.ship_hp = 418

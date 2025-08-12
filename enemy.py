@@ -24,17 +24,17 @@ class Enemy:
         self.position = Vector2(0, 0)
         self.velocity = Vector2(0, 0)
         
-        self.max_speed = random.choice([200.0, 250.0, 300.0])
+        self.max_speed = random.choice([100.0,200.0,220.0,110.0,120.0,130.0,140.0,150.0,160.0,170.0,180.0,190.0,210.0,230.0,240.0,250.0])
         
         self.acceleration = 5.0
         
         self.direction_change_timer = 0
         self.direction_change_interval = random.randint(1000, 3000)
         # 边界定义
-        self.left_bound = self.screen_rect.centerx - 310
-        self.right_bound = self.screen_rect.centerx + 290
-        self.top_bound = self.screen_rect.centery - 300
-        self.bottom_bound = self.screen_rect.centery + 330
+        self.left_bound = self.screen_rect.centerx - 390
+        self.right_bound = self.screen_rect.centerx + 390
+        self.top_bound = self.screen_rect.centery - 400
+        self.bottom_bound = self.screen_rect.centery + 380
         
         safe_spawn_options = [
             [random.uniform(self.left_bound + 50, self.right_bound - 50), self.top_bound + 50],

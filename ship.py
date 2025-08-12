@@ -1,6 +1,5 @@
 import pygame
 import rpath
-import math
 from pygame.math import Vector2
 
 class Ship:
@@ -20,8 +19,8 @@ class Ship:
         
         self.rect = self.image.get_rect()
         self.rect.midbottom = self.screen_rect.center
-        self.position = pygame.math.Vector2(self.rect.center)
-        self.velocity = pygame.math.Vector2(0, 0)
+        self.position = Vector2(self.rect.center)
+        self.velocity = Vector2(0, 0)
         self.max_speed = self.settings.ship_speed
         self.acceleration = 5.0
         self.deceleration = 0.8
@@ -47,16 +46,19 @@ class Ship:
         self.player_pos = [self.screen_rect.centerx, self.screen_rect.centery]
 
     def center_ship(self):
-        self.rect.midbottom = self.screen_rect.center
-        self.position = pygame.math.Vector2(self.rect.center)
-        self.velocity = pygame.math.Vector2(0, 0)
+        # 获取当前屏幕的最新尺寸
+        current_screen_rect = self.screen.get_rect()
+        
+        self.rect.midbottom = current_screen_rect.center
+        self.position = Vector2(self.rect.center)
+        self.velocity = Vector2(0, 0)
         self.state = self.STATE_NORMAL
         self.hit_duration = 0.0
         self.collision_cooldown = 0.0
 
     def handle_input(self):
         keys = pygame.key.get_pressed()
-        input_vector = pygame.math.Vector2(0, 0)
+        input_vector = Vector2(0, 0)
         
         if keys[pygame.K_d]:
             input_vector.x += 1
@@ -74,16 +76,20 @@ class Ship:
         self.velocity = self.velocity.lerp(target_velocity, self.acceleration * 0.1)
         
         if input_vector.length() == 0:
-            self.velocity = self.velocity.lerp(pygame.math.Vector2(0, 0), self.deceleration)
+            self.velocity = self.velocity.lerp(Vector2(0, 0), self.deceleration)
 
     def update_movement(self, dt):
         self.position += self.velocity * dt
         self.rect.center = self.position
-        # 边界定义
-        left_bound = self.screen_rect.centerx - 310
-        right_bound = self.screen_rect.centerx + 290
-        top_bound = self.screen_rect.centery - 300
-        bottom_bound = self.screen_rect.centery + 330
+        
+        # 获取当前屏幕的最新尺寸
+        current_screen_rect = self.screen.get_rect()
+        
+        # 使用当前屏幕中心计算边界
+        left_bound = current_screen_rect.centerx - 390
+        right_bound = current_screen_rect.centerx + 390
+        top_bound = current_screen_rect.centery - 400
+        bottom_bound = current_screen_rect.centery + 380
         
         if self.rect.left < left_bound:
             self.rect.left = left_bound
