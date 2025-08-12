@@ -58,8 +58,8 @@ class Cryprawl:
         self.sound_img_rect.centerx = self.setting_ui_img_rect.centerx - 70
         self.sound_img_rect.centery = self.setting_ui_img_rect.centery - 130
 
-        
-        
+
+
         #游戏状态
         self.game_state = self.STATE_MAINMENU
         self.is_fullscreen = False
@@ -148,34 +148,39 @@ class Cryprawl:
         self.bullet_digits = []
         for i in range(10):
             self.bullet_digits.append(pygame.image.load(rpath.rpath(f'assets/images/bullets/bullet_digits/{i}.png')).convert_alpha())
-        
+
         # 音频
         pygame.mixer.init()
         pygame.mixer.set_num_channels(64)
         pygame.mixer.music.load(rpath.rpath("assets/audio/background.mp3"))
         pygame.mixer.music.play(loops=-1, fade_ms=1000)
-        pygame.mixer.music.set_volume(0.2)
+        pygame.mixer.music.set_volume(self.settings.game_volume)
         
         self.snd_hit = pygame.mixer.Sound(rpath.rpath("assets/audio/hit.wav"))
-        self.snd_hit.set_volume(0.1)
+        self.snd_hit.set_volume(self.settings.game_volume)
         
         self.snd_shoot = pygame.mixer.Sound(rpath.rpath("assets/audio/shoot.wav"))
-        self.snd_shoot.set_volume(0.1)
+        self.snd_shoot.set_volume(self.settings.game_volume)
         
         self.snd_explode = pygame.mixer.Sound(rpath.rpath("assets/audio/explode.wav"))
-        self.snd_explode.set_volume(0.1)
+        self.snd_explode.set_volume(self.settings.game_volume)
         
         self.snd_score = pygame.mixer.Sound(rpath.rpath("assets/audio/score.wav"))
-        self.snd_score.set_volume(0.2)
+        self.snd_score.set_volume(self.settings.game_volume)
         
         self.snd_click = pygame.mixer.Sound(rpath.rpath("assets/audio/click.wav"))
-        self.snd_click.set_volume(0.6)
+        self.snd_click.set_volume(self.settings.click_volume)
         
         self.snd_gameover = pygame.mixer.Sound(rpath.rpath("assets/audio/gameover.wav"))
-        self.snd_gameover.set_volume(0.5)
+        self.snd_gameover.set_volume(self.settings.game_volume)
         
         self.explode_channel = pygame.mixer.Channel(0)
 
+    #play_sound方法
+    def play_sound(self, sound_obj, loops=0, maxtime=0):
+        if self.is_sound_off:
+            return
+        sound_obj.play(loops=loops, maxtime=maxtime)
     # 事件处理
     def _check_events(self):
         for event in pygame.event.get():
@@ -206,7 +211,7 @@ class Cryprawl:
             button_rect.y <= mouse_y <= button_rect.y + button_rect.height and
             self.game_state == self.STATE_MAINMENU and not self.dying):
             self.game_state = self.STATE_GAMERUNNING
-            self.snd_click.play()
+            self.play_sound(self.snd_click)
     def _check_setting_button(self, mouse_pos):
         mouse_x, mouse_y = mouse_pos
         button_rect = self.setting_button.rect
@@ -214,14 +219,14 @@ class Cryprawl:
             button_rect.y <= mouse_y <= button_rect.y + button_rect.height and
             self.game_state == self.STATE_MAINMENU and not self.dying):
             self.game_state = self.STATE_SETTING
-            self.snd_click.play()
+            self.play_sound(self.snd_click)
     def _check_exit_button(self, mouse_pos):
         mouse_x, mouse_y = mouse_pos
         button_rect = self.exit_button.rect
         if (button_rect.x <= mouse_x <= button_rect.x + button_rect.width and
             button_rect.y <= mouse_y <= button_rect.y + button_rect.height and
             self.game_state == self.STATE_MAINMENU and not self.dying):
-            self.snd_click.play()
+            self.play_sound(self.snd_click)
             if self.max_score > self.all_max_score:
                 self.all_max_score = self.max_score
             print(f"最后一局最大分数为: {self.max_score}")
@@ -234,7 +239,7 @@ class Cryprawl:
         if (button_rect.x <= mouse_x <= button_rect.x + button_rect.width and
             button_rect.y <= mouse_y <= button_rect.y + button_rect.height and
             self.game_state == self.STATE_SETTING and not self.dying):
-            self.snd_click.play()
+            self.play_sound(self.snd_click)
             self.game_state = self.STATE_MAINMENU
     def _check_fullscreen_button(self, mouse_pos):
         mouse_x, mouse_y = mouse_pos
@@ -242,7 +247,7 @@ class Cryprawl:
         if (button_rect.x <= mouse_x <= button_rect.x + button_rect.width and
             button_rect.y <= mouse_y <= button_rect.y + button_rect.height and
             self.game_state == self.STATE_SETTING and not self.dying):
-            self.snd_click.play()
+            self.play_sound(self.snd_click)
             if self.is_fullscreen:
                 screen = pygame.display.set_mode((self.settings.screen_width, self.settings.screen_height))
                 self.is_fullscreen = False
@@ -256,13 +261,14 @@ class Cryprawl:
         if (button_rect.x <= mouse_x <= button_rect.x + button_rect.width and
             button_rect.y <= mouse_y <= button_rect.y + button_rect.height and
             self.game_state == self.STATE_SETTING and not self.dying):
-            self.snd_click.play()
+            self.play_sound(self.snd_click)
             if self.is_sound_off:
                 self.is_sound_off = False
-                pygame.mixer.music.set_volume(0.2)
+                pygame.mixer.music.unpause()
             else:
                 self.is_sound_off = True
-                pygame.mixer.music.set_volume(0.0)
+                pygame.mixer.music.pause()
+
     # 子弹相关
     def _fire_bullet(self):
         if self.bullet_count > 0:
@@ -270,7 +276,7 @@ class Cryprawl:
             new_bullet = Bullet(self, mouse_pos)
             self.bullets.add(new_bullet)
             self.bullet_count -= 1
-            self.snd_shoot.play(maxtime=0)
+            self.play_sound(self.snd_shoot)
 
     def _update_bullets(self, dt):
         self.bullets.update(dt)
@@ -290,7 +296,7 @@ class Cryprawl:
                         self._handle_enemy_death(bullet, enemy)
                     else:
                         self.bullets.remove(bullet)
-                        self.snd_hit.play(maxtime=0)
+                        self.play_sound(self.snd_hit)
                     break
             
             # 与batmage碰撞
@@ -305,7 +311,7 @@ class Cryprawl:
                         self._handle_batmage_death(bullet, batmage)
                     else:
                         self.bullets.remove(bullet)
-                        self.snd_hit.play(maxtime=0)
+                        self.play_sound(self.snd_hit)
                     break
 
             # 与蝙蝠碰撞
@@ -320,7 +326,7 @@ class Cryprawl:
                         self._handle_bat_death(bullet, bat)
                     else:
                         self.bullets.remove(bullet)
-                        self.snd_hit.play(maxtime=0)
+                        self.play_sound(self.snd_hit)
                     break
 
     def _check_collision(self, obj1, obj2):
@@ -338,7 +344,7 @@ class Cryprawl:
         self.dead_enemies_count += 1
         self.score += 2
         self.bullet_count += 3
-        self.explode_channel.play(self.snd_explode)
+        self.play_sound(self.snd_explode)
 
     def _handle_batmage_death(self, bullet, batmage):
         self.bullets.remove(bullet)
@@ -348,7 +354,7 @@ class Cryprawl:
         self.batmages.remove(batmage)
         self.score += 50
         self.bullet_count += 30
-        self.explode_channel.play(self.snd_explode)
+        self.play_sound(self.snd_explode)
 
     def _handle_bat_death(self, bullet, bat):
         self.bullets.remove(bullet)
@@ -358,7 +364,7 @@ class Cryprawl:
         self.bats.remove(bat)
         self.score += 3
         self.bullet_count += 3
-        self.explode_channel.play(self.snd_explode)
+        self.play_sound(self.snd_explode)
 
     # 蝙蝠相关
     def _create_bat(self):
@@ -381,7 +387,7 @@ class Cryprawl:
             bat.death_start_time = pygame.time.get_ticks()
             self.dead_bats.append(bat)
             self.bats.remove(bat)
-            self.explode_channel.play(self.snd_explode)
+            self.play_sound(self.snd_explode)
         else:
             self.ship.take_damage(51)
             self._handle_ship_death()
@@ -426,7 +432,7 @@ class Cryprawl:
                 self.score = max(0, self.score - 7)
             self.bullet_count += 3
             self.max_score = self.score
-            self.explode_channel.play(self.snd_explode)
+            self.play_sound(self.snd_explode)
             print(f"现在还剩: {self.ship.hp} 点血量")
         else:
             self._handle_ship_death()
@@ -444,7 +450,7 @@ class Cryprawl:
                 self.score = max(0, self.score - 8)
             self.bullet_count += 10
             self.max_score = self.score
-            self.explode_channel.play(self.snd_explode)
+            self.play_sound(self.snd_explode)
             print(f"现在还剩: {self.ship.hp} 点血量")
         else:
             self._handle_ship_death()
@@ -458,7 +464,7 @@ class Cryprawl:
         self.bullets.empty()
         self.batmages.clear()
         self.bats.clear()
-        self.snd_gameover.play()
+        self.play_sound(self.snd_gameover)
 
     #主屏幕绘制
     def _update_screen(self):
@@ -477,7 +483,7 @@ class Cryprawl:
 
             self.screen.blit(self.sound_img,self.sound_img_rect)
             self.screen.blit(self.sound_button.image,self.sound_button.rect)
-            if self.is_sound_off:
+            if not self.is_sound_off:
                 self.screen.blit(self.sound_tick_img,self.sound_tick_img_rect)
 
 
