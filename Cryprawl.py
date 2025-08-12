@@ -52,12 +52,18 @@ class Cryprawl:
         self.fullscreen_img_rect = self.fullscreen_img.get_rect()
         self.fullscreen_img_rect.centerx = self.setting_ui_img_rect.centerx - 70
         self.fullscreen_img_rect.centery = self.setting_ui_img_rect.centery - 190
+        #设置sound贴图
+        self.sound_img = pygame.image.load(rpath.rpath("assets/images/button/sound.png"))
+        self.sound_img_rect = self.sound_img.get_rect()
+        self.sound_img_rect.centerx = self.setting_ui_img_rect.centerx - 70
+        self.sound_img_rect.centery = self.setting_ui_img_rect.centery - 130
 
         
         
         #游戏状态
         self.game_state = self.STATE_MAINMENU
         self.is_fullscreen = False
+        self.is_sound_off = False
         # 游戏对象
         self.enemies = []
         self.dead_enemies = []
@@ -96,14 +102,30 @@ class Cryprawl:
         self.fullscreen_button = Button(self)
         self.fullscreen_button.rect.centerx = self.fullscreen_img_rect.centerx + 230
         self.fullscreen_button.rect.centery = self.fullscreen_img_rect.centery + 20
-        self.fullscreen_button.width = 48
-        self.fullscreen_button.height = 48
+        self.fullscreen_button.width = 28
+        self.fullscreen_button.height = 28
         self.fullscreen_button.image = pygame.image.load(rpath.rpath("assets/images/button/checkbox.png")).convert_alpha()
-        #tick贴图
-        self.tick_img = pygame.image.load(rpath.rpath("assets/images/button/tick.png"))
-        self.tick_img_rect = self.tick_img.get_rect()
-        self.tick_img_rect.centerx = self.fullscreen_button.rect.centerx - 66
-        self.tick_img_rect.centery = self.fullscreen_button.rect.centery - 10
+
+        # sound_button
+        self.sound_button = Button(self)
+        self.sound_button.rect.centerx = self.sound_img_rect.centerx + 230
+        self.sound_button.rect.centery = self.sound_img_rect.centery + 20
+        self.sound_button.width = 38
+        self.sound_button.width = 38
+        self.sound_button.image = pygame.image.load(rpath.rpath("assets/images/button/checkbox.png")).convert_alpha()
+
+        #fullscreen_tick贴图
+        self.fullscreen_tick_img = pygame.image.load(rpath.rpath("assets/images/button/tick.png"))
+        self.fullscreen_tick_img_rect = self.fullscreen_tick_img.get_rect()
+        self.fullscreen_tick_img_rect.centerx = self.fullscreen_button.rect.centerx - 66
+        self.fullscreen_tick_img_rect.centery = self.fullscreen_button.rect.centery - 10
+
+        #sound_tick贴图
+        self.sound_tick_img = pygame.image.load(rpath.rpath("assets/images/button/tick.png"))
+        self.sound_tick_img_rect = self.sound_tick_img.get_rect()
+        self.sound_tick_img_rect.centerx = self.sound_button.rect.centerx - 66
+        self.sound_tick_img_rect.centery = self.sound_button.rect.centery - 10
+
         # 游戏数据
         self.game_run_times = 0
         self.score = 0
@@ -175,6 +197,7 @@ class Cryprawl:
                 elif self.game_state == self.STATE_SETTING:
                     self._check_back_button(mouse_pos)
                     self._check_fullscreen_button(mouse_pos)
+                    self._check_sound_button(mouse_pos)
     #Button相关
     def _check_play_button(self, mouse_pos):
         mouse_x, mouse_y = mouse_pos
@@ -226,8 +249,20 @@ class Cryprawl:
             else:
                 screen = pygame.display.set_mode((pygame.display.Info().current_w, pygame.display.Info().current_h),pygame.FULLSCREEN)
                 self.is_fullscreen = True
-                
 
+    def _check_sound_button(self, mouse_pos):
+        mouse_x, mouse_y = mouse_pos
+        button_rect = self.sound_button.rect
+        if (button_rect.x <= mouse_x <= button_rect.x + button_rect.width and
+            button_rect.y <= mouse_y <= button_rect.y + button_rect.height and
+            self.game_state == self.STATE_SETTING and not self.dying):
+            self.snd_click.play()
+            if self.is_sound_off:
+                self.is_sound_off = False
+                pygame.mixer.music.set_volume(0.2)
+            else:
+                self.is_sound_off = True
+                pygame.mixer.music.set_volume(0.0)
     # 子弹相关
     def _fire_bullet(self):
         if self.bullet_count > 0:
@@ -432,11 +467,20 @@ class Cryprawl:
         #绘制设置界面
         if self.game_state == self.STATE_SETTING:
             self.screen.blit(self.setting_ui_img,self.setting_ui_img_rect)
-            self.screen.blit(self.fullscreen_img,self.fullscreen_img_rect)
+
             self.screen.blit(self.back_button.image,self.back_button.rect)
+
+            self.screen.blit(self.fullscreen_img,self.fullscreen_img_rect)
             self.screen.blit(self.fullscreen_button.image,self.fullscreen_button.rect)
             if self.is_fullscreen:
-                self.screen.blit(self.tick_img,self.tick_img_rect)
+                self.screen.blit(self.fullscreen_tick_img,self.fullscreen_tick_img_rect)
+
+            self.screen.blit(self.sound_img,self.sound_img_rect)
+            self.screen.blit(self.sound_button.image,self.sound_button.rect)
+            if self.is_sound_off:
+                self.screen.blit(self.sound_tick_img,self.sound_tick_img_rect)
+
+
 
         #绘制玩家
         if not self.ship.state == self.ship.STATE_DYING and self.game_state == self.STATE_GAMERUNNING:
