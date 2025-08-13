@@ -15,7 +15,7 @@ class Cryprawl:
     STATE_GAMERUNNING = 'gamerunning'
     STATE_MAINMENU = 'mainmenu'
     STATE_SETTING = 'setting'
-    
+    STATE_PAUSEMENU = 'pausemenu'
     def __init__(self):
         pygame.init()
         self.settings = Settings()
@@ -31,12 +31,17 @@ class Cryprawl:
         self.game_state = self.STATE_MAINMENU
         self.is_fullscreen = False
         self.is_sound_off = False
-        
+        self.room_number = 0
+        self.cur_room_over = False
+        self.dying = False
+
         # 游戏对象
         self.enemies = []
         self.dead_enemies = []
         self.dead_enemies_count = 0
         self.enough_dead_enemies_count = 40
+        self.dead_batmages_count = 0
+        self.enough_dead_batmage_count = 1
         
         self.batmages = []
         self.dead_batmages = []
@@ -59,13 +64,13 @@ class Cryprawl:
         self.max_score = 0
         self.all_max_score = 0
         self.bullet_count = self.settings.bullet_count
-        self.dying = False
+
 
         # 计时器
-        self.wait_ship_death_over_tick = 0
-        self.wait_enemy_spawn_tick = 0
-        self.wait_batmage_spawn_tick = 0
-        self.wait_bat_spawn_tick = 0
+        self.wait_ship_death_over_tick = pygame.time.get_ticks()
+        self.wait_enemy_spawn_tick = pygame.time.get_ticks()
+        self.wait_batmage_spawn_tick = pygame.time.get_ticks()
+        self.wait_bat_spawn_tick = pygame.time.get_ticks()
 
         # digits image
         self.digits = []
@@ -75,6 +80,11 @@ class Cryprawl:
         self.bullet_digits = []
         for i in range(10):
             self.bullet_digits.append(pygame.image.load(rpath.rpath(f'assets/images/bullets/bullet_digits/{i}.png')).convert_alpha())
+        
+        # room digits image
+        self.room_digits = []
+        for i in range(10):
+            self.room_digits.append(pygame.image.load(rpath.rpath(f'assets/images/digits/{i}.png')).convert_alpha())
 
         # sound
         pygame.mixer.init()
@@ -145,6 +155,10 @@ class Cryprawl:
         self.sound_tick_img = pygame.image.load(rpath.rpath("assets/images/button/tick.png"))
         self.sound_tick_img_rect = self.sound_tick_img.get_rect()
 
+        # stair贴图
+        self.stair_img = pygame.image.load(rpath.rpath("assets/images/background/stair.png"))
+        self.stair_img_rect = self.stair_img.get_rect()
+
     def _init_buttons(self):
         # play_button
         self.play_button = Button(self)
@@ -184,10 +198,14 @@ class Cryprawl:
         # background贴图
         self.bg_img_rect.centerx = self.screen_rect.centerx
         self.bg_img_rect.centery = self.screen_rect.centery
-        
+
         # game_arena贴图
         self.game_arena_img_rect.centerx = self.screen_rect.centerx
         self.game_arena_img_rect.centery = self.screen_rect.centery
+
+        # stair贴图
+        self.stair_img_rect.centerx = self.game_arena_img_rect.centerx
+        self.stair_img_rect.centery = self.game_arena_img_rect.centery
         
         # 设置UI贴图
         self.setting_ui_img_rect.centerx = self.screen_rect.centerx
@@ -390,6 +408,7 @@ class Cryprawl:
         batmage.death_start_time = pygame.time.get_ticks()
         self.dead_batmages.append(batmage)
         self.batmages.remove(batmage)
+        self.dead_batmages_count += 1
         self.score += 50
         self.bullet_count += 30
         self.play_sound(self.snd_explode)
@@ -404,7 +423,6 @@ class Cryprawl:
         self.bullet_count += 3
         self.play_sound(self.snd_explode)
 
-    # 蝙蝠相关
     def create_bat(self):
         new_bat = Bat(self)
         self.bats.append(new_bat)
@@ -429,7 +447,6 @@ class Cryprawl:
         else:
             self.handle_ship_death()
 
-    # batmage相关
     def create_batmage(self):
         new_batmage = Batmage(self)
         self.batmages.append(new_batmage)
@@ -438,7 +455,6 @@ class Cryprawl:
         for batmage in self.batmages:
             batmage.update(dt)
 
-    # enemy相关
     def create_enemy(self):
         new_enemy = Enemy(self)
         self.enemies.append(new_enemy)
@@ -503,6 +519,11 @@ class Cryprawl:
         self.bats.clear()
         self.play_sound(self.snd_gameover)
 
+    def render_stair(self):
+        # 绘制楼梯
+        self.screen.blit(self.stair_img, self.stair_img_rect)
+
+
     def render_screen(self):
         # 绘制背景
         self.screen.blit(self.bg_img, self.bg_img_rect)
@@ -559,6 +580,10 @@ class Cryprawl:
                 self.screen.blit(bat.image, bat.rect)
                 
             self.render_game_hud()
+            
+            # 显示楼梯
+            if self.cur_room_over:
+                self.render_stair()
     
     def render_dead_enemies(self, now):
         for dead in self.dead_enemies[:]:
@@ -624,6 +649,19 @@ class Cryprawl:
             img = self.digits[int(digit)]
             x_score -= img.get_width()
             self.screen.blit(img, (x_score, 10))
+            
+        # 房间号
+        room_str = str(self.room_number)
+        room_width = 0
+        for digit in room_str:
+            img = self.room_digits[int(digit)]
+            room_width += img.get_width()
+        
+        x_room = self.screen_rect.centerx - room_width // 2
+        for digit in room_str:
+            img = self.room_digits[int(digit)]
+            self.screen.blit(img, (x_room, 10))
+            x_room += img.get_width()
     
     def render_ui_elements(self):
         if self.game_state == self.STATE_MAINMENU and not self.dying:
@@ -655,6 +693,8 @@ class Cryprawl:
         self.dead_enemies.clear()
         self.dead_batmages.clear()
         self.dead_bats.clear()
+        self.room_number = 0
+        self.cur_room_over = False
 
     # 主游戏循环
     def run_game(self):
@@ -679,19 +719,39 @@ class Cryprawl:
     def update_game_state(self, dt):
         self.ship.update(dt)
         self.update_bullets(dt)
-        self.update_enemies(dt)
+        self.update_room_number()
         
         now = pygame.time.get_ticks()
-        if now - self.wait_enemy_spawn_tick >= 700:
-            self.create_enemy()
-            self.wait_enemy_spawn_tick = now
         
-        if self.dead_enemies_count >= self.enough_dead_enemies_count:
-            self.create_batmage()
-            self.enough_dead_enemies_count += 70
-        
-        self.update_batmages(dt)
-        self.update_bats(dt)
+        # 只在当前房间未结束时生成敌人
+        if not self.cur_room_over:
+            # 敌人生成
+            if now - self.wait_enemy_spawn_tick >= 700:
+                self.create_enemy()
+                self.wait_enemy_spawn_tick = now
+            
+            # 蝙蝠法师生成
+            if self.dead_enemies_count >= self.enough_dead_enemies_count:
+                self.create_batmage()
+                self.enough_dead_enemies_count += 70
+            
+            # 更新敌人状态
+            self.update_enemies(dt)
+            self.update_batmages(dt)
+            self.update_bats(dt)
+    
+    def update_room_number(self):
+        # 检查是否满足结束当前房间的条件
+        for i in range(100):
+            if self.room_number == i and self.dead_batmages_count >= self.enough_dead_batmage_count:
+                self.cur_room_over = True  # 设置当前房间结束
+
+        # 如果当前房间结束且玩家碰到楼梯，进入下一个房间
+        if self.cur_room_over and self.ship.rect.colliderect(self.stair_img_rect):
+            self.room_number += 1
+            self.cur_room_over = False
+            self.dead_batmages_count = 0
+            print(f"现在的层数为:{self.room_number}")
 
 
 # 入口
