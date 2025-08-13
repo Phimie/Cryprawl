@@ -9,7 +9,7 @@ class Bat:
     STATE_MOVING = 'moving'
     STATE_HIT = 'hit'
     STATE_DYING = 'dying'
-    
+
     def __init__(self, sf_game):
         self.screen = sf_game.screen
         self.settings = sf_game.settings
@@ -84,11 +84,9 @@ class Bat:
         top_bound = self.sf_game.screen_rect.centery - 400
         bottom_bound = self.sf_game.screen_rect.centery + 380
         
-        # 保存原始位置用于碰撞后回退
         original_x = self.rect.x
         original_y = self.rect.y
         
-        # 应用击退速度
         self.rect.x += self.knockback_velocity.x * dt
         self.rect.y += self.knockback_velocity.y * dt
         
@@ -121,7 +119,6 @@ class Bat:
             
             self.hit_duration = 0.1
         
-        # 击退速度衰减
         self.knockback_velocity *= 0.85
 
     def update_normal_movement(self, dt):

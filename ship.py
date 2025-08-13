@@ -46,7 +46,6 @@ class Ship:
         self.player_pos = [self.screen_rect.centerx, self.screen_rect.centery]
 
     def center_ship(self):
-        # 获取当前屏幕的最新尺寸
         current_screen_rect = self.screen.get_rect()
         
         self.rect.midbottom = current_screen_rect.center
@@ -82,10 +81,8 @@ class Ship:
         self.position += self.velocity * dt
         self.rect.center = self.position
         
-        # 获取当前屏幕的最新尺寸
         current_screen_rect = self.screen.get_rect()
         
-        # 使用当前屏幕中心计算边界
         left_bound = current_screen_rect.centerx - 390
         right_bound = current_screen_rect.centerx + 390
         top_bound = current_screen_rect.centery - 400

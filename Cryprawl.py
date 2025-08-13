@@ -39,7 +39,7 @@ class Cryprawl:
         self.enemies = []
         self.dead_enemies = []
         self.dead_enemies_count = 0
-        self.enough_dead_enemies_count = 40
+        self.enough_dead_enemies_count = 10
         self.dead_batmages_count = 0
         self.enough_dead_batmage_count = 1
         
@@ -575,6 +575,7 @@ class Cryprawl:
                 
             for batmage in self.batmages:
                 self.screen.blit(batmage.image, batmage.rect)
+                pygame.draw.rect(self.screen, (255, 0, 0), batmage.rect, 2)
             
             for bat in self.bats:
                 self.screen.blit(bat.image, bat.rect)
@@ -723,30 +724,24 @@ class Cryprawl:
         
         now = pygame.time.get_ticks()
         
-        # 只在当前房间未结束时生成敌人
         if not self.cur_room_over:
-            # 敌人生成
             if now - self.wait_enemy_spawn_tick >= 700:
                 self.create_enemy()
                 self.wait_enemy_spawn_tick = now
             
-            # 蝙蝠法师生成
             if self.dead_enemies_count >= self.enough_dead_enemies_count:
                 self.create_batmage()
                 self.enough_dead_enemies_count += 70
             
-            # 更新敌人状态
             self.update_enemies(dt)
             self.update_batmages(dt)
             self.update_bats(dt)
     
     def update_room_number(self):
-        # 检查是否满足结束当前房间的条件
         for i in range(100):
             if self.room_number == i and self.dead_batmages_count >= self.enough_dead_batmage_count:
-                self.cur_room_over = True  # 设置当前房间结束
+                self.cur_room_over = True
 
-        # 如果当前房间结束且玩家碰到楼梯，进入下一个房间
         if self.cur_room_over and self.ship.rect.colliderect(self.stair_img_rect):
             self.room_number += 1
             self.cur_room_over = False
