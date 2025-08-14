@@ -344,7 +344,7 @@ class Cryprawl:
         
         # 与batmage碰撞
         for batmage in self.batmages[:]:
-            if bullet.rect.colliderect(batmage.rect):
+            if bullet.rect.colliderect(batmage.hitbox_rect):
                 self.handle_bullet_batmage_collision(bullet, batmage)
                 return
         
@@ -468,7 +468,7 @@ class Cryprawl:
                 self.handle_ship_enemy_collision(enemy)
                 
         for batmage in self.batmages:
-            if self.ship.rect.colliderect(batmage.rect):
+            if self.ship.rect.colliderect(batmage.hitbox_rect):
                 self.handle_ship_batmage_collision(batmage)
     
     def handle_ship_enemy_collision(self, enemy):
@@ -575,7 +575,7 @@ class Cryprawl:
                 
             for batmage in self.batmages:
                 self.screen.blit(batmage.image, batmage.rect)
-                pygame.draw.rect(self.screen, (255, 0, 0), batmage.rect, 2)
+                pygame.draw.rect(self.screen, (255, 0, 0), batmage.hitbox_rect, 2)
             
             for bat in self.bats:
                 self.screen.blit(bat.image, bat.rect)
