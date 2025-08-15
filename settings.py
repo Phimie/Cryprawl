@@ -1,3 +1,4 @@
+import random
 class Settings:
 
     def __init__(self):
@@ -20,6 +21,6 @@ class Settings:
         self.Batmage_speed = 180
 
         #bat
-        self.bat_speed = 160
+        self.bat_speed = random.uniform(100.0,150.0)
 
 

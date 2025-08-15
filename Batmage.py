@@ -17,7 +17,7 @@ class Batmage:
         self.settings    = sf_game.settings
         self.sf_game     = sf_game
 
-        # 加载并缩放动画帧
+        # 加载动画
         self.frames_await  = [pygame.transform.smoothscale(
             pygame.image.load(rpath.rpath(f'assets/images/batmage/batmage{i}.png')).convert_alpha(),
             (400, 320)) for i in range(8)]
@@ -34,7 +34,7 @@ class Batmage:
             pygame.image.load(rpath.rpath(f'assets/images/batmage/batmage{i}.png')).convert_alpha(),
             (400, 320)) for i in range(102, 111)]
         
-        # 初始化精灵矩形
+        # 初始化矩形
         self.rect = self.frames_await[0].get_rect()
         
         # 随机选择出生点
@@ -94,7 +94,6 @@ class Batmage:
         self.bottom_bound = self.screen_rect.height - self.hitbox_rect.height // 2
 
     def _update_target(self):
-        """更新移动目标位置"""
         now = pygame.time.get_ticks()
         if now - self.update_target_tick >= 8000:
             self.target_x, self.target_y = random.choice([
@@ -106,7 +105,6 @@ class Batmage:
             self.update_target_tick = now
 
     def _summon_bat(self):
-        """召唤蝙蝠"""
         now = pygame.time.get_ticks()
         if now - self.summon_cooldown_tick >= 3000 and self.state != self.STATE_DYING:
             self.state = self.STATE_SUMMONING
@@ -118,7 +116,6 @@ class Batmage:
             self.summon_cooldown_tick = now
 
     def apply_knockback(self, direction):
-        """应用击退效果"""
         if direction.length() > 0:
             direction = direction.normalize()
         else:
@@ -133,7 +130,6 @@ class Batmage:
             del self.state_before_hit
 
     def update_movement(self, dt):
-        """更新移动逻辑"""
         if self.state == self.STATE_HIT:
             # 击退状态
             self.rect.x += self.knockback_velocity.x * dt
@@ -210,7 +206,6 @@ class Batmage:
                 self._summon_bat()
 
     def update_animation(self, dt):
-        """更新动画状态"""
         self.animation_timer += dt * 1000
 
         if self.state == self.STATE_DYING:
@@ -258,7 +253,6 @@ class Batmage:
                 self.image = self.frames_await[self.current_frame]
 
     def update(self, dt):
-        """更新蝙蝠法师状态"""
         now = pygame.time.get_ticks()
 
         # 死亡状态处理
@@ -312,7 +306,6 @@ class Batmage:
         self.hitbox_rect.centery = self.rect.centery + 60
 
     def take_damage(self, damage, direction):
-        """受到伤害"""
         self.hp -= damage
         
         # 如果不是被击中状态，保存当前状态

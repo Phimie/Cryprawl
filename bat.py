@@ -29,17 +29,17 @@ class Bat:
 
         # spawn
         self.spawn_xy = random.choice([
-            [self.screen_rect.centerx + 350, self.screen_rect.centery + 350],
-            [self.screen_rect.centerx - 350, self.screen_rect.centery + 350],
-            [self.screen_rect.centerx + 350, self.screen_rect.centery - 350],
-            [self.screen_rect.centerx - 350, self.screen_rect.centery - 350]
+            [random.uniform(self.sf_game.screen_rect.centerx - 390 + 50, self.sf_game.screen_rect.centerx + 390 - 50), self.sf_game.screen_rect.centery - 400 + 50],
+            [random.uniform(self.sf_game.screen_rect.centerx - 390 + 50, self.sf_game.screen_rect.centerx + 390 - 50), self.sf_game.screen_rect.centery + 380 - 50],
+            [self.sf_game.screen_rect.centerx - 390 + 50, random.uniform(self.sf_game.screen_rect.centery - 400 + 50, self.sf_game.screen_rect.centery + 380 - 50)],
+            [self.sf_game.screen_rect.centerx + 390 - 50, random.uniform(self.sf_game.screen_rect.centery - 400 + 50, self.sf_game.screen_rect.centery + 380 - 50)]
         ])
         self.rect.x = self.spawn_xy[0]
         self.rect.y = self.spawn_xy[1]
         
         # move
-        self.speed = 200.0
-        self.max_speed = 250.0
+        self.speed = random.uniform(200.0,230.0)
+        self.max_speed = random.uniform(250.0,280.0)
         self.acceleration = 5.0
         self.deceleration = 0.8
         

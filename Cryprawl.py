@@ -34,6 +34,7 @@ class Cryprawl:
         self.room_number = 0
         self.cur_room_over = False
         self.dying = False
+        self.debug_mode = False
 
         # 游戏对象
         self.enemies = []
@@ -146,14 +147,20 @@ class Cryprawl:
         # sound贴图
         self.sound_img = pygame.image.load(rpath.rpath("assets/images/button/sound.png"))
         self.sound_img_rect = self.sound_img.get_rect()
+
+        # hitbox贴图
+        self.hitbox_img = pygame.image.load(rpath.rpath("assets/images/button/hitbox.png"))
+        self.hitbox_img_rect = self.hitbox_img.get_rect()
         
-        # fullscreen_tick贴图
+        # tick贴图
         self.fullscreen_tick_img = pygame.image.load(rpath.rpath("assets/images/button/tick.png"))
         self.fullscreen_tick_img_rect = self.fullscreen_tick_img.get_rect()
         
-        # sound_tick贴图
         self.sound_tick_img = pygame.image.load(rpath.rpath("assets/images/button/tick.png"))
         self.sound_tick_img_rect = self.sound_tick_img.get_rect()
+
+        self.hitbox_tick_img = pygame.image.load(rpath.rpath("assets/images/button/tick.png"))
+        self.hitbox_tick_img_rect = self.hitbox_tick_img.get_rect()
 
         # stair贴图
         self.stair_img = pygame.image.load(rpath.rpath("assets/images/background/stair.png"))
@@ -184,9 +191,16 @@ class Cryprawl:
         
         # sound_button
         self.sound_button = Button(self)
-        self.sound_button.width = 38
-        self.sound_button.height = 38
+        self.sound_button.width = 28
+        self.sound_button.height = 28
         self.sound_button.image = pygame.image.load(rpath.rpath("assets/images/button/checkbox.png")).convert_alpha()
+
+        # hitbox_button
+        self.hitbox_button = Button(self)
+        self.hitbox_button.width = 28
+        self.hitbox_button.height = 28
+        self.hitbox_button.image = pygame.image.load(rpath.rpath("assets/images/button/checkbox.png")).convert_alpha()
+
 
     def update_ui_positions(self):
         self.screen_rect = self.screen.get_rect()
@@ -218,8 +232,12 @@ class Cryprawl:
         # 设置sound贴图
         self.sound_img_rect.centerx = self.setting_ui_img_rect.centerx - 70
         self.sound_img_rect.centery = self.setting_ui_img_rect.centery - 130
+
+        # 设置hitbox贴图
+        self.hitbox_img_rect.centerx = self.setting_ui_img_rect.centerx - 70
+        self.hitbox_img_rect.centery = self.setting_ui_img_rect.centery - 70
         
-        # 按钮位置
+        # checkbox位置
         self.play_button.rect.center = self.screen_rect.center
         self.setting_button.rect.centerx = self.screen_rect.centerx
         self.setting_button.rect.centery = self.screen_rect.centery + 80
@@ -227,34 +245,32 @@ class Cryprawl:
         self.exit_button.rect.centery = self.screen_rect.centery + 160
         self.back_button.rect.centerx = self.setting_ui_img_rect.centerx - 100
         self.back_button.rect.centery = self.setting_ui_img_rect.centery + 210
+
         self.fullscreen_button.rect.centerx = self.fullscreen_img_rect.centerx + 230
         self.fullscreen_button.rect.centery = self.fullscreen_img_rect.centery + 20
         self.sound_button.rect.centerx = self.sound_img_rect.centerx + 230
         self.sound_button.rect.centery = self.sound_img_rect.centery + 20
+        self.hitbox_button.rect.centerx = self.hitbox_img_rect.centerx + 230
+        self.hitbox_button.rect.centery = self.hitbox_img_rect.centery + 20
         
-        # checkbox位置
+        # tick位置
         self.fullscreen_tick_img_rect.centerx = self.fullscreen_button.rect.centerx - 66
         self.fullscreen_tick_img_rect.centery = self.fullscreen_button.rect.centery - 10
         self.sound_tick_img_rect.centerx = self.sound_button.rect.centerx - 66
         self.sound_tick_img_rect.centery = self.sound_button.rect.centery - 10
+        self.hitbox_tick_img_rect.centerx = self.hitbox_button.rect.centerx - 66
+        self.hitbox_tick_img_rect.centery = self.hitbox_button.rect.centery - 10
         
         # 更新飞船位置
         self.ship.center_ship()
 
+    # 静音
     def play_sound(self, sound_obj, loops=0, maxtime=0):
         if self.is_sound_off:
             return
         sound_obj.play(loops=loops, maxtime=maxtime)
-    
-    def handle_events(self):
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                self.quit_game()
-            elif event.type == pygame.VIDEORESIZE:
-                self.update_ui_positions()
-            elif event.type == pygame.MOUSEBUTTONDOWN:
-                self.handle_mouse_click(pygame.mouse.get_pos())
-    
+
+    # 退出
     def quit_game(self):
         if self.max_score > self.all_max_score:
             self.all_max_score = self.max_score
@@ -263,6 +279,24 @@ class Cryprawl:
         print(f"游戏局数为: {self.game_run_times}")
         sys.exit()
     
+    # 处理事件
+    def handle_events(self):
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                self.quit_game()
+            elif event.type == pygame.VIDEORESIZE:
+                self.update_ui_positions()
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                self.handle_mouse_click(pygame.mouse.get_pos())
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_F3:
+                    self.toggle_hitbox()
+
+
+            
+    
+
+    # 处理鼠标点击
     def handle_mouse_click(self, mouse_pos):
         if self.game_state == self.STATE_MAINMENU:
             self.handle_main_menu_click(mouse_pos)
@@ -271,6 +305,7 @@ class Cryprawl:
         elif self.game_state == self.STATE_SETTING:
             self.handle_setting_menu_click(mouse_pos)
     
+    # 处理主界面点击
     def handle_main_menu_click(self, mouse_pos):
         if self.play_button.rect.collidepoint(mouse_pos):
             self.start_game()
@@ -279,6 +314,7 @@ class Cryprawl:
         elif self.exit_button.rect.collidepoint(mouse_pos):
             self.quit_game()
     
+    # 处理设置界面点击
     def handle_setting_menu_click(self, mouse_pos):
         if self.back_button.rect.collidepoint(mouse_pos):
             self.close_settings()
@@ -286,6 +322,9 @@ class Cryprawl:
             self.toggle_fullscreen()
         elif self.sound_button.rect.collidepoint(mouse_pos):
             self.toggle_sound()
+        elif self.hitbox_button.rect.collidepoint(mouse_pos):
+            self.toggle_hitbox()
+
     
     def start_game(self):
         self.game_state = self.STATE_GAMERUNNING
@@ -299,6 +338,7 @@ class Cryprawl:
         self.game_state = self.STATE_MAINMENU
         self.play_sound(self.snd_click)
     
+    # 开关全屏
     def toggle_fullscreen(self):
         self.play_sound(self.snd_click)
         if self.is_fullscreen:
@@ -311,6 +351,7 @@ class Cryprawl:
         # 更新UI位置
         self.update_ui_positions()
     
+    # 开关声音
     def toggle_sound(self):
         self.play_sound(self.snd_click)
         if self.is_sound_off:
@@ -319,6 +360,14 @@ class Cryprawl:
         else:
             self.is_sound_off = True
             pygame.mixer.music.pause()
+
+    # 开关hitbox
+    def toggle_hitbox(self):
+        self.play_sound(self.snd_click)
+        if self.debug_mode:
+            self.debug_mode = False
+        else:
+            self.debug_mode = True
 
     def fire_bullet(self):
         if self.bullet_count > 0:
@@ -544,19 +593,27 @@ class Cryprawl:
     def render_settings_menu(self):
         self.screen.blit(self.setting_ui_img, self.setting_ui_img_rect)
         self.screen.blit(self.back_button.image, self.back_button.rect)
+
         self.screen.blit(self.fullscreen_img, self.fullscreen_img_rect)
         self.screen.blit(self.fullscreen_button.image, self.fullscreen_button.rect)
         if self.is_fullscreen:
             self.screen.blit(self.fullscreen_tick_img, self.fullscreen_tick_img_rect)
+
         self.screen.blit(self.sound_img, self.sound_img_rect)
         self.screen.blit(self.sound_button.image, self.sound_button.rect)
         if not self.is_sound_off:
             self.screen.blit(self.sound_tick_img, self.sound_tick_img_rect)
+
+        self.screen.blit(self.hitbox_img, self.hitbox_img_rect)
+        self.screen.blit(self.hitbox_button.image, self.hitbox_button.rect)
+        if self.debug_mode:
+            self.screen.blit(self.hitbox_tick_img, self.hitbox_tick_img_rect)
     
     def render_game_objects(self):
         # 绘制玩家
         if not self.ship.state == self.ship.STATE_DYING and self.game_state == self.STATE_GAMERUNNING:
             self.ship.blitme()
+            self.hitbox_display(self.ship.rect)
 
         now = pygame.time.get_ticks()
         self.render_dead_enemies(now)
@@ -572,13 +629,15 @@ class Cryprawl:
         if self.game_state == self.STATE_GAMERUNNING:
             for enemy in self.enemies:
                 self.screen.blit(enemy.image, enemy.rect)
+                self.hitbox_display(enemy.rect)
                 
             for batmage in self.batmages:
                 self.screen.blit(batmage.image, batmage.rect)
-                pygame.draw.rect(self.screen, (255, 0, 0), batmage.hitbox_rect, 2)
+                self.hitbox_display(batmage.hitbox_rect)
             
             for bat in self.bats:
                 self.screen.blit(bat.image, bat.rect)
+                self.hitbox_display(bat.rect)
                 
             self.render_game_hud()
             
@@ -747,6 +806,12 @@ class Cryprawl:
             self.cur_room_over = False
             self.dead_batmages_count = 0
             print(f"现在的层数为:{self.room_number}")
+
+    def hitbox_display(self,rect):
+        if self.debug_mode:
+            pygame.draw.rect(self.screen, (255, 0, 0), rect, 2)
+        else:
+            pass
 
 
 # 入口
