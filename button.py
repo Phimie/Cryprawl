@@ -1,8 +1,8 @@
 import pygame
 import rpath
 class Button:
-    def __init__(self,sf_game):
-        self.screen = sf_game.screen
+    def __init__(self,cr_game):
+        self.screen = cr_game.screen
         self.screen_rect = self.screen.get_rect()
         self.width, self.height = 192, 74
         self.rect = pygame.Rect(0, 0, self.width, self.height)

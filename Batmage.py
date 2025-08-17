@@ -11,11 +11,11 @@ class Batmage:
     STATE_HIT       = 'hit'
     STATE_DYING     = 'dying'
 
-    def __init__(self, sf_game):
-        self.screen      = sf_game.screen
-        self.screen_rect = sf_game.screen.get_rect()
-        self.settings    = sf_game.settings
-        self.sf_game     = sf_game
+    def __init__(self, cr_game):
+        self.screen      = cr_game.screen
+        self.screen_rect = cr_game.screen.get_rect()
+        self.settings    = cr_game.settings
+        self.cr_game     = cr_game
 
         # 加载动画
         self.frames_await  = [pygame.transform.smoothscale(
@@ -109,10 +109,10 @@ class Batmage:
         if now - self.summon_cooldown_tick >= 3000 and self.state != self.STATE_DYING:
             self.state = self.STATE_SUMMONING
             self.summon_start_time = now
-            self.sf_game.Batmage_is_summoning = True
+            self.cr_game.Batmage_is_summoning = True
             for _ in range(8):
-                self.sf_game.create_bat()
-            self.sf_game.Batmage_is_summoning = False
+                self.cr_game.create_bat()
+            self.cr_game.Batmage_is_summoning = False
             self.summon_cooldown_tick = now
 
     def apply_knockback(self, direction):
@@ -264,9 +264,9 @@ class Batmage:
             if idx < len(self.frames_death):
                 self.image = self.frames_death[idx]
             if elapsed >= 400:
-                self.sf_game.dead_batmages.append(self)
-                if self in self.sf_game.batmages:
-                    self.sf_game.batmages.remove(self)
+                self.cr_game.dead_batmages.append(self)
+                if self in self.cr_game.batmages:
+                    self.cr_game.batmages.remove(self)
             return
 
         # 被击中状态处理

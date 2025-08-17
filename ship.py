@@ -7,10 +7,10 @@ class Ship:
     STATE_HIT = 'hit'
     STATE_DYING = 'dying'
     
-    def __init__(self, sf_game):
-        self.screen = sf_game.screen
-        self.settings = sf_game.settings
-        self.screen_rect = sf_game.screen.get_rect()
+    def __init__(self, cr_game):
+        self.screen = cr_game.screen
+        self.settings = cr_game.settings
+        self.screen_rect = cr_game.screen.get_rect()
         
         self.frames = []
         for i in range(8):

@@ -10,11 +10,11 @@ class Bat:
     STATE_HIT = 'hit'
     STATE_DYING = 'dying'
 
-    def __init__(self, sf_game):
-        self.screen = sf_game.screen
-        self.settings = sf_game.settings
-        self.sf_game = sf_game
-        self.screen_rect = sf_game.screen.get_rect()
+    def __init__(self, cr_game):
+        self.screen = cr_game.screen
+        self.settings = cr_game.settings
+        self.cr_game = cr_game
+        self.screen_rect = cr_game.screen.get_rect()
 
         # 加载image
         self.frames_move = []
@@ -29,10 +29,10 @@ class Bat:
 
         # spawn
         self.spawn_xy = random.choice([
-            [random.uniform(self.sf_game.screen_rect.centerx - 390 + 50, self.sf_game.screen_rect.centerx + 390 - 50), self.sf_game.screen_rect.centery - 400 + 50],
-            [random.uniform(self.sf_game.screen_rect.centerx - 390 + 50, self.sf_game.screen_rect.centerx + 390 - 50), self.sf_game.screen_rect.centery + 380 - 50],
-            [self.sf_game.screen_rect.centerx - 390 + 50, random.uniform(self.sf_game.screen_rect.centery - 400 + 50, self.sf_game.screen_rect.centery + 380 - 50)],
-            [self.sf_game.screen_rect.centerx + 390 - 50, random.uniform(self.sf_game.screen_rect.centery - 400 + 50, self.sf_game.screen_rect.centery + 380 - 50)]
+            [random.uniform(self.cr_game.screen_rect.centerx - 390 + 50, self.cr_game.screen_rect.centerx + 390 - 50), self.cr_game.screen_rect.centery - 400 + 50],
+            [random.uniform(self.cr_game.screen_rect.centerx - 390 + 50, self.cr_game.screen_rect.centerx + 390 - 50), self.cr_game.screen_rect.centery + 380 - 50],
+            [self.cr_game.screen_rect.centerx - 390 + 50, random.uniform(self.cr_game.screen_rect.centery - 400 + 50, self.cr_game.screen_rect.centery + 380 - 50)],
+            [self.cr_game.screen_rect.centerx + 390 - 50, random.uniform(self.cr_game.screen_rect.centery - 400 + 50, self.cr_game.screen_rect.centery + 380 - 50)]
         ])
         self.rect.x = self.spawn_xy[0]
         self.rect.y = self.spawn_xy[1]
@@ -79,10 +79,10 @@ class Bat:
 
     def update_knockback_movement(self, dt):
         # 获取当前边界
-        left_bound = self.sf_game.screen_rect.centerx - 390
-        right_bound = self.sf_game.screen_rect.centerx + 390
-        top_bound = self.sf_game.screen_rect.centery - 400
-        bottom_bound = self.sf_game.screen_rect.centery + 380
+        left_bound = self.cr_game.screen_rect.centerx - 390
+        right_bound = self.cr_game.screen_rect.centerx + 390
+        top_bound = self.cr_game.screen_rect.centery - 400
+        bottom_bound = self.cr_game.screen_rect.centery + 380
         
         original_x = self.rect.x
         original_y = self.rect.y
@@ -123,13 +123,13 @@ class Bat:
 
     def update_normal_movement(self, dt):
         # 获取当前边界
-        left_bound = self.sf_game.screen_rect.centerx - 390
-        right_bound = self.sf_game.screen_rect.centerx + 390
-        top_bound = self.sf_game.screen_rect.centery - 400
-        bottom_bound = self.sf_game.screen_rect.centery + 380
+        left_bound = self.cr_game.screen_rect.centerx - 390
+        right_bound = self.cr_game.screen_rect.centerx + 390
+        top_bound = self.cr_game.screen_rect.centery - 400
+        bottom_bound = self.cr_game.screen_rect.centery + 380
         
         # 目标位置
-        target_x, target_y = float(self.sf_game.ship.player_pos[0]), float(self.sf_game.ship.player_pos[1])
+        target_x, target_y = float(self.cr_game.ship.player_pos[0]), float(self.cr_game.ship.player_pos[1])
         dx = target_x - self.rect.x
         dy = target_y - self.rect.y
         length = max(1.0, math.sqrt(dx*dx + dy*dy))
@@ -212,8 +212,8 @@ class Bat:
                 self.death_start_time = now
             
             if now - self.death_start_time >= 400:
-                self.sf_game.dead_bats.append(self)
-                self.sf_game.bats.remove(self)
+                self.cr_game.dead_bats.append(self)
+                self.cr_game.bats.remove(self)
             return
         
         # 击退状态处理

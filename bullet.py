@@ -4,17 +4,17 @@ import math
 from pygame.sprite import Sprite
 
 class Bullet(Sprite):
-    def __init__(self, sf_game, target_pos):
+    def __init__(self, cr_game, target_pos):
         super().__init__()
-        self.screen   = sf_game.screen
-        self.settings = sf_game.settings
+        self.screen   = cr_game.screen
+        self.settings = cr_game.settings
         self.damage   = 51
         self.origin_image = pygame.image.load(
             rpath.rpath("assets/images/bullets/bullet.png")
         ).convert_alpha()
 
-        start_x = float(sf_game.ship.rect.centerx)
-        start_y = float(sf_game.ship.rect.centery)
+        start_x = float(cr_game.ship.rect.centerx)
+        start_y = float(cr_game.ship.rect.centery)
         target_x = float(target_pos[0])
         target_y = float(target_pos[1])
         dx = target_x - start_x
