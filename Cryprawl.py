@@ -62,6 +62,7 @@ class Cryprawl:
         # 游戏数据
         self.game_run_times = 0
         self.score = 0
+        self.coin = 0
         self.max_score = 0
         self.all_max_score = 0
         self.bullet_count = self.settings.bullet_count
