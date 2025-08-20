@@ -20,3 +20,5 @@ class EnemyBase:
         self.screen_rect = cr_game.screen.get_rect()
 
         
+        # spawn
+        self.spawn_xy = random.choice

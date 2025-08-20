@@ -10,6 +10,7 @@ from enemy import Enemy
 from button import Button
 from Batmage import Batmage
 from bat import Bat
+from coin import Coin
 
 class Cryprawl:
     STATE_GAMERUNNING = 'gamerunning'
@@ -50,6 +51,8 @@ class Cryprawl:
         self.bats = []
         self.dead_bats = []
         
+        self.coins = []
+        self.picked_coins = []
         # player
         self.ship = Ship(self)
         
@@ -370,6 +373,7 @@ class Cryprawl:
         else:
             self.debug_mode = True
 
+    # 开火
     def fire_bullet(self):
         if self.bullet_count > 0:
             mouse_pos = pygame.mouse.get_pos()
@@ -378,6 +382,7 @@ class Cryprawl:
             self.bullet_count -= 1
             self.play_sound(self.snd_shoot)
     
+    # 更新子弹
     def update_bullets(self, dt):
         self.bullets.update(dt)
         
@@ -385,6 +390,7 @@ class Cryprawl:
         for bullet in self.bullets.copy():
             self.check_bullet_collisions(bullet)
     
+    # 检测子弹碰撞
     def check_bullet_collisions(self, bullet):
         # 与enemy碰撞
         for enemy in self.enemies[:]:
@@ -404,6 +410,7 @@ class Cryprawl:
                 self.handle_bullet_bat_collision(bullet, bat)
                 return
     
+    # 处理子弹与enemy碰撞
     def handle_bullet_enemy_collision(self, bullet, enemy):
         dx = enemy.rect.centerx - bullet.rect.centerx
         dy = enemy.rect.centery - bullet.rect.centery
@@ -416,7 +423,8 @@ class Cryprawl:
         else:
             self.bullets.remove(bullet)
             self.play_sound(self.snd_hit)
-    
+
+    # 处理子弹与batmage碰撞
     def handle_bullet_batmage_collision(self, bullet, batmage):
         dx = batmage.rect.centerx - bullet.rect.centerx
         dy = batmage.rect.centery - bullet.rect.centery
@@ -429,6 +437,7 @@ class Cryprawl:
             self.bullets.remove(bullet)
             self.play_sound(self.snd_hit)
     
+    # 处理子弹与bat碰撞
     def handle_bullet_bat_collision(self, bullet, bat):
         dx = bat.rect.centerx - bullet.rect.centerx
         dy = bat.rect.centery - bullet.rect.centery
@@ -441,6 +450,7 @@ class Cryprawl:
             self.bullets.remove(bullet)
             self.play_sound(self.snd_hit)
     
+    # 处理enemy死亡
     def handle_enemy_death(self, bullet, enemy):
         self.bullets.remove(bullet)
         enemy.state = enemy.STATE_DYING
@@ -452,6 +462,7 @@ class Cryprawl:
         self.bullet_count += 3
         self.play_sound(self.snd_explode)
     
+    # 处理batmage死亡
     def handle_batmage_death(self, bullet, batmage):
         self.bullets.remove(bullet)
         batmage.state = batmage.STATE_DYING
@@ -463,6 +474,7 @@ class Cryprawl:
         self.bullet_count += 30
         self.play_sound(self.snd_explode)
     
+    # 处理bat死亡
     def handle_bat_death(self, bullet, bat):
         self.bullets.remove(bullet)
         bat.state = bat.STATE_DYING
@@ -473,10 +485,12 @@ class Cryprawl:
         self.bullet_count += 3
         self.play_sound(self.snd_explode)
 
+    # 创建bat
     def create_bat(self):
         new_bat = Bat(self)
         self.bats.append(new_bat)
-        
+    
+    # 更新bat  
     def update_bats(self, dt):
         for bat in self.bats:
             bat.update(dt)
@@ -704,12 +718,21 @@ class Cryprawl:
         pygame.draw.rect(self.screen, (236, 30, 4), pygame.Rect(82, 38, bar_width, 21))
 
         # 分数
-        score_str = str(self.score)
-        x_score = self.screen_rect.width - 10
-        for digit in reversed(score_str):
+        # score_str = str(self.score)
+        # x_score = self.screen_rect.width - 10
+        # for digit in reversed(score_str):
+        #     img = self.digits[int(digit)]
+        #     x_score -= img.get_width()
+        #     self.screen.blit(img, (x_score, 10))
+
+        # 金币数
+        coin_str = str(self.coin)
+        x_coin = self.screen_rect.width - 10
+        for digit in reversed(coin_str):
             img = self.digits[int(digit)]
-            x_score -= img.get_width()
-            self.screen.blit(img, (x_score, 10))
+            x_coin -= img.get_width()
+            self.coin_imgs_rect.x -= img.get_width()
+            self.screen.blit(img, (x_coin, 10))
             
         # 房间号
         room_str = str(self.room_number)
